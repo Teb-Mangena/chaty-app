@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import morgan from "morgan";
 // local imports
@@ -16,6 +17,7 @@ const { PORT } = ENV;
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(cookieParser());
 
 // routes 
 app.use('/api/auth', authRoutes);
