@@ -1,6 +1,7 @@
 import validator from "validator";
 import bcrypt from "bcryptjs";
 import User from "../models/user.model.js";
+import cloudinary from "../lib/cloudinary.js";
 import { generateToken } from "../lib/utils.js";
 
 export const signupUser = async (req, res) => {
@@ -59,7 +60,6 @@ export const signupUser = async (req, res) => {
   }
 }
 
-
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -99,4 +99,31 @@ export const loginUser = async (req, res) => {
 export const logoutUser = (_, res) => {
   res.cookie('jwt', '', {maxAge: 0});
   res.status(200).json({ message: "Logged out successfully" });
+}
+
+export const updateProfile = async (req, res) => {
+  const { profilePic } = req.body;
+  console.log(req.user);
+
+  try {
+
+    if(!profilePic) return res.status(400).json({ message: "Profile picture is required" });
+
+    const userId = req.user._id;
+
+    const uploadResponse = await cloudinary.uploader.upload(profilePic)
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId, 
+      { profilePic: uploadResponse.secure_url }, { new: true }
+    );
+
+    res.status(200).json({ 
+      message: "Profile updated successfully", updatedUser 
+    });
+    
+  } catch (error) {
+    console.log('Error in updateProfile:', error);
+    return res.status(500).json({ message: "Server error" });
+  }
 }
