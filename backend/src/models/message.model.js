@@ -17,7 +17,9 @@ const MessageSchema = new Schema({
     type: String
   },
   text: {
-    type: String
+    type: String,
+    trim: true,
+    maxlength: 2000
   }
 },{timestamps: true});
 
